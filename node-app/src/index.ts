@@ -2,25 +2,44 @@ const printLine = (text: string, breakLine: boolean = true) => {
     process.stdout.write(text + (breakLine ? '\n' : ''))
 }
 
-const promptInput = async (text: string) => {
-    printLine(`\n${text}\n> `, false)
-    const input: string = await new Promise((resolve) => process.stdin.once('data', (data) =>
-                            resolve(data.toString())))
+const readLine = async () => {
+    const input: string = await new Promise((resolve) =>
+                            process.stdin.once('data', (data) => resolve(data.toString())))
     return input.trim()
 }
+
+const promptInput = async (text: string) => {
+    printLine(`\n${text}\n> `, false)
+    return readLine()
+}
+
+const promptSelect = async <T extends string>(text: string, values: readonly T[]): Promise<T> => {
+    printLine(`\n${text}`)
+    values.forEach((value) => {
+        printLine(`= ${value}`)
+    })
+    printLine(`> `, false)
+
+    const input = (await readLine()) as T
+    if(values.includes(input)) {
+        return input
+    } else {
+        return promptSelect<T>(text, values)
+    }
+}
+
+const modes = ['normal', 'hard'] as const
+type Mode = typeof modes[number]
 
 class HitAndBlow {
     private answerSource = ['0','1','2','3','4','5','6','7','8','9']
     private answer: string[] = []
     private tryCount = 0
-    private mode: 'normal' | 'hard'
+    private mode: Mode = 'normal'
 
-    constructor(mode: 'normal' | 'hard') {
-        this.mode = mode
-    }
-
-    setting() {
-        const answerLength = 3
+    async setting() {
+        this.mode = await promptSelect<Mode>('モードを入力してください。', modes)
+        const answerLength = this.getAnswerLength()
 
         while (this.answer.length < answerLength) {
             const randNum = Math.floor(Math.random() * this.answerSource.length)
@@ -32,7 +51,8 @@ class HitAndBlow {
     }
 
     async play() {
-        const inputArr = (await promptInput('「,]区切りで3つの数字を入力してください')).split(',')
+        const answerLength = this.getAnswerLength()
+        const inputArr = (await promptInput(`「,]区切りで${answerLength}つの数字を入力してください`)).split(',')
 
         if(!this.validate(inputArr)) {
             printLine('無効な入力です。')
@@ -82,11 +102,23 @@ class HitAndBlow {
         const isAllDifferentValues = inputArr.every((val, i) => inputArr.indexOf(val) === i)
         return isLengthValid && isAllAnswerSourceOption && isAllDifferentValues
     }
+
+    private getAnswerLength() {
+        switch (this.mode) {
+            case 'normal':
+                return 3
+            case 'hard':
+                return 4
+            default:
+                const neverValue: never = this.mode
+                throw new Error(`${neverValue}は無効なモードです。`)
+        }
+    }
 }
 
 ;(async () => {
-    const hitAndBlow = new HitAndBlow('normal')
-    hitAndBlow.setting()
+    const hitAndBlow = new HitAndBlow()
+    await hitAndBlow.setting()
     await hitAndBlow.play()
     hitAndBlow.end()
 })()

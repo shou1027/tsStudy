@@ -14,7 +14,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -39,44 +39,87 @@ var printLine = function (text, breakLine) {
     if (breakLine === void 0) { breakLine = true; }
     process.stdout.write(text + (breakLine ? '\n' : ''));
 };
-var promptInput = function (text) { return __awaiter(void 0, void 0, void 0, function () {
+var readLine = function () { return __awaiter(void 0, void 0, void 0, function () {
     var input;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                printLine("\n" + text + "\n> ", false);
-                return [4 /*yield*/, new Promise(function (resolve) { return process.stdin.once('data', function (data) {
-                        return resolve(data.toString());
-                    }); })];
+            case 0: return [4 /*yield*/, new Promise(function (resolve) {
+                    return process.stdin.once('data', function (data) { return resolve(data.toString()); });
+                })];
             case 1:
                 input = _a.sent();
                 return [2 /*return*/, input.trim()];
         }
     });
 }); };
+var promptInput = function (text) { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        printLine("\n".concat(text, "\n> "), false);
+        return [2 /*return*/, readLine()];
+    });
+}); };
+var promptSelect = function (text, values) { return __awaiter(void 0, void 0, void 0, function () {
+    var input;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                printLine("\n".concat(text));
+                values.forEach(function (value) {
+                    printLine("= ".concat(value));
+                });
+                printLine("> ", false);
+                return [4 /*yield*/, readLine()];
+            case 1:
+                input = (_a.sent());
+                if (values.includes(input)) {
+                    return [2 /*return*/, input];
+                }
+                else {
+                    return [2 /*return*/, promptSelect(text, values)];
+                }
+                return [2 /*return*/];
+        }
+    });
+}); };
+var modes = ['normal', 'hard'];
 var HitAndBlow = /** @class */ (function () {
-    function HitAndBlow(mode) {
+    function HitAndBlow() {
         this.answerSource = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
         this.answer = [];
         this.tryCount = 0;
-        this.mode = mode;
+        this.mode = 'normal';
     }
     HitAndBlow.prototype.setting = function () {
-        var answerLength = 3;
-        while (this.answer.length < answerLength) {
-            var randNum = Math.floor(Math.random() * this.answerSource.length);
-            var selectedItem = this.answerSource[randNum];
-            if (!this.answer.includes(selectedItem)) {
-                this.answer.push(selectedItem);
-            }
-        }
+        return __awaiter(this, void 0, void 0, function () {
+            var _a, answerLength, randNum, selectedItem;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = this;
+                        return [4 /*yield*/, promptSelect('モードを入力してください。', modes)];
+                    case 1:
+                        _a.mode = _b.sent();
+                        answerLength = this.getAnswerLength();
+                        while (this.answer.length < answerLength) {
+                            randNum = Math.floor(Math.random() * this.answerSource.length);
+                            selectedItem = this.answerSource[randNum];
+                            if (!this.answer.includes(selectedItem)) {
+                                this.answer.push(selectedItem);
+                            }
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     HitAndBlow.prototype.play = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var inputArr, result;
+            var answerLength, inputArr, result;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, promptInput('「,]区切りで3つの数字を入力してください')];
+                    case 0:
+                        answerLength = this.getAnswerLength();
+                        return [4 /*yield*/, promptInput("\u300C,]\u533A\u5207\u308A\u3067".concat(answerLength, "\u3064\u306E\u6570\u5B57\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044"))];
                     case 1:
                         inputArr = (_a.sent()).split(',');
                         if (!!this.validate(inputArr)) return [3 /*break*/, 3];
@@ -89,7 +132,7 @@ var HitAndBlow = /** @class */ (function () {
                         result = this.check(inputArr);
                         if (!(result.hit !== this.answer.length)) return [3 /*break*/, 5];
                         // 不正解だったら続ける
-                        printLine("---\nHit: " + result.hit + "\nBlow: " + result.blow + "\n---");
+                        printLine("---\nHit: ".concat(result.hit, "\nBlow: ").concat(result.blow, "\n---"));
                         this.tryCount += 1;
                         return [4 /*yield*/, this.play()];
                     case 4:
@@ -105,7 +148,7 @@ var HitAndBlow = /** @class */ (function () {
         });
     };
     HitAndBlow.prototype.end = function () {
-        printLine("\u6B63\u89E3\u3067\u3059\uFF01\n\u8A66\u884C\u56DE\u6570: " + this.tryCount + "\u56DE");
+        printLine("\u6B63\u89E3\u3067\u3059\uFF01\n\u8A66\u884C\u56DE\u6570: ".concat(this.tryCount, "\u56DE"));
         process.exit();
     };
     HitAndBlow.prototype.check = function (input) {
@@ -132,6 +175,17 @@ var HitAndBlow = /** @class */ (function () {
         var isAllDifferentValues = inputArr.every(function (val, i) { return inputArr.indexOf(val) === i; });
         return isLengthValid && isAllAnswerSourceOption && isAllDifferentValues;
     };
+    HitAndBlow.prototype.getAnswerLength = function () {
+        switch (this.mode) {
+            case 'normal':
+                return 3;
+            case 'hard':
+                return 4;
+            default:
+                var neverValue = this.mode;
+                throw new Error("".concat(neverValue, "\u306F\u7121\u52B9\u306A\u30E2\u30FC\u30C9\u3067\u3059\u3002"));
+        }
+    };
     return HitAndBlow;
 }());
 ;
@@ -140,10 +194,12 @@ var HitAndBlow = /** @class */ (function () {
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                hitAndBlow = new HitAndBlow('normal');
-                hitAndBlow.setting();
-                return [4 /*yield*/, hitAndBlow.play()];
+                hitAndBlow = new HitAndBlow();
+                return [4 /*yield*/, hitAndBlow.setting()];
             case 1:
+                _a.sent();
+                return [4 /*yield*/, hitAndBlow.play()];
+            case 2:
                 _a.sent();
                 hitAndBlow.end();
                 return [2 /*return*/];
