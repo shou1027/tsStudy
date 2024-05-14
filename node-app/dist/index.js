@@ -83,6 +83,11 @@ var promptSelect = function (text, values) { return __awaiter(void 0, void 0, vo
 }); };
 var nextActions = ['play again', 'change game', 'exit'];
 var gameTitles = ['hit and blow', 'janken'];
+var Game = /** @class */ (function () {
+    function Game() {
+    }
+    return Game;
+}());
 var GameProcedure = /** @class */ (function () {
     function GameProcedure(gameStore) {
         this.gameStore = gameStore;
