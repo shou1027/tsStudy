@@ -81,19 +81,40 @@ var promptSelect = function (text, values) { return __awaiter(void 0, void 0, vo
         }
     });
 }); };
-var nextActions = ['play again', 'exit'];
+var nextActions = ['play again', 'change game', 'exit'];
+var gameTitles = ['hit and blow', 'janken'];
 var GameProcedure = /** @class */ (function () {
-    function GameProcedure() {
-        this.currentGameTitle = 'hit and blow';
-        this.currentGame = new HitAndBlow();
+    function GameProcedure(gameStore) {
+        this.gameStore = gameStore;
+        this.currentGameTitle = '';
+        this.currentGame = null;
     }
     GameProcedure.prototype.start = function () {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.play()];
+                    case 0: return [4 /*yield*/, this.select()];
                     case 1:
                         _a.sent();
+                        return [4 /*yield*/, this.play()];
+                    case 2:
+                        _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    GameProcedure.prototype.select = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var _a;
+            return __generator(this, function (_b) {
+                switch (_b.label) {
+                    case 0:
+                        _a = this;
+                        return [4 /*yield*/, promptSelect('ゲームのタイトルを入力してください。', gameTitles)];
+                    case 1:
+                        _a.currentGameTitle = _b.sent();
+                        this.currentGame = this.gameStore[this.currentGameTitle];
                         return [2 /*return*/];
                 }
             });
@@ -105,6 +126,8 @@ var GameProcedure = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        if (!this.currentGame)
+                            throw new Error('ゲームが選択されていません');
                         printLine("===\n".concat(this.currentGameTitle, " \u3092\u958B\u59CB\u3057\u307E\u3059\u3002\n==="));
                         return [4 /*yield*/, this.currentGame.setting()];
                     case 1:
@@ -120,8 +143,17 @@ var GameProcedure = /** @class */ (function () {
                         return [4 /*yield*/, this.play()];
                     case 4:
                         _a.sent();
-                        return [3 /*break*/, 6];
+                        return [3 /*break*/, 9];
                     case 5:
+                        if (!(action === 'change game')) return [3 /*break*/, 8];
+                        return [4 /*yield*/, this.select()];
+                    case 6:
+                        _a.sent();
+                        return [4 /*yield*/, this.play()];
+                    case 7:
+                        _a.sent();
+                        return [3 /*break*/, 9];
+                    case 8:
                         if (action === 'exit') {
                             this.end();
                         }
@@ -129,8 +161,8 @@ var GameProcedure = /** @class */ (function () {
                             neverValue = action;
                             throw new Error("".concat(neverValue, " is an invalid action."));
                         }
-                        _a.label = 6;
-                    case 6: return [2 /*return*/];
+                        _a.label = 9;
+                    case 9: return [2 /*return*/];
                 }
             });
         });
@@ -362,7 +394,10 @@ var Janken = /** @class */ (function () {
 ;
 (function () { return __awaiter(void 0, void 0, void 0, function () {
     return __generator(this, function (_a) {
-        new GameProcedure().start();
+        new GameProcedure({
+            'hit and blow': new HitAndBlow(),
+            'janken': new Janken(),
+        }).start();
         return [2 /*return*/];
     });
 }); })();
