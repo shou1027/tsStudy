@@ -3,8 +3,8 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack -w",
-    "build": "webpack",
+    "dev": "NODE_OPTIONS=--openssl-legacy-provider webpack -w",
+    "build": "NODE_OPTIONS=--openssl-legacy-provider webpack",
     "serve": "serve ./ -p 3000"
   },
   "keywords": [],
