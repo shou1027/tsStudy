@@ -1,10 +1,20 @@
+import { EventListener } from "./EventListener"
+
 class Application {
     start() {
+        const eventListener = new EventListener
         const button = document.getElementById('deleteAllDoneTask')
 
         if(!button) return
-        
-        console.log(button)
+
+        eventListener.add(
+            'sample',
+            'click',
+            button,
+            () => alert('clicked'),
+        )
+
+        eventListener.remove('sample')
     }
 }
 
