@@ -1,10 +1,14 @@
 import { EventListener } from "./EventListener"
 import { Task } from "./Task"
 import { TaskCollection } from './TaskCollection';
+import { TaskRenderer } from "./TaskRenderer";
 
 class Application {
     private readonly eventListener = new EventListener()
     private readonly TaskCollection = new TaskCollection()
+    private readonly taskRenderer = new TaskRenderer(
+        document.getElementById('todoList') as HTMLElement
+    )
 
     start() {
         const createForm = document.getElementById('createForm') as HTMLElement
@@ -22,7 +26,10 @@ class Application {
         const task = new Task({ title: titleInput.value })
         
         this.TaskCollection.add(task)
-        console.log(this.TaskCollection)
+
+        this.taskRenderer.append(task)
+
+        titleInput.value = ''
     }
 }
 
