@@ -13,8 +13,13 @@ class Application {
     )
 
     start() {
+        const taskItems = this.taskRenderer.renderAll(this.taskCollection)
         const createForm = document.getElementById('createForm') as HTMLElement
         const deleteAllDoneTaskButton = document.getElementById('deleteAllDoneTask') as HTMLElement
+
+        taskItems.forEach(({ task, deleteButtonEl }) => {
+            this.eventListener.add(task.id, 'click', deleteButtonEl, () => this.handleClickDeleteTask)
+        })
 
         this.eventListener.add('submit-handler', 'submit', createForm, this.handleSubmit)
         this.eventListener.add('click-handler', 'click', deleteAllDoneTaskButton, this.handleClickDeleteAllDoneTasks)
@@ -77,7 +82,19 @@ class Application {
         task.update({ status: newStatus })
         this.taskCollection.update(task)
 
-        console.log(sibling)
+        if(sibling) {
+            const nextTaskId = this.taskRenderer.getId(sibling)
+
+            if(!nextTaskId) return
+
+            const nextTask = this.taskCollection.find(nextTaskId)
+
+            if(!nextTask) return
+
+            this.taskCollection.moveAboveTarget(task, nextTask)
+        } else {
+            this.taskCollection.moveToLast(task)
+        }
     }
 }
 
