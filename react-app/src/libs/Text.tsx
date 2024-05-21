@@ -1,3 +1,18 @@
-export const Text = (props: { text: string }) => {
-    return <p>{props.text}</p>
+import { VFC } from "react"
+import styled from "styled-components"
+import { fontSize } from "./constants"
+
+type Props = {
+    text: string
+    className?: string
 }
+
+export const Text: VFC<Props> = ({ text, className = '' }) => {
+    return (
+        <Wrapper className={className}>{text}</Wrapper>
+    )
+}
+
+const Wrapper = styled.p`
+    fontSize: ${fontSize.m};
+`
