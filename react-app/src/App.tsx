@@ -14,7 +14,7 @@ export const App = () => {
             <Button onClick={() => console.log('clicked!')} title="Button" type="primary" width={96} />
             <Button onClick={() => console.warn('clicked!')} title="Button" type="secondary" />
             <Button onClick={() => console.error('clicked!')} title="Button" type="error" />
-            <Textarea width={500} />
+            <Textarea width={200} maxLength={100} />
         </>
     )
 }
